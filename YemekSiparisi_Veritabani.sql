@@ -104,3 +104,29 @@ VALUES
 ('Cem', 'Yılmaz', '05550000001', '34 ABC 001'), ('Burak', 'Kaya', '05550000002', '34 ABC 002'),
 ('Kaan', 'Demir', '05550000003', '34 ABC 003'), ('Tolga', 'Şahin', '05550000004', '34 ABC 004'),
 ('Oğuz', 'Çelik', '05550000005', '34 ABC 005');
+
+-- Menuler Tablosuna 50 Adet Veri
+INSERT INTO Menuler (RestoranID, UrunAdi, Fiyat)
+VALUES 
+(1, 'Mercimek Çorbası', 45.00), (1, 'Ezogelin Çorbası', 45.00), (1, 'Kuru Fasulye', 90.00), (1, 'Nohut Yemeği', 85.00), (1, 'Tereyağlı Pilav', 50.00),
+(1, 'Bulgur Pilavı', 45.00), (1, 'İzmir Köfte', 140.00), (1, 'Fırın Makarna', 80.00), (1, 'Cacık', 35.00), (1, 'Sütlaç', 60.00),
+(2, 'Adana Kebap', 220.00), (2, 'Urfa Kebap', 220.00), (2, 'Beyti Sarma', 260.00), (2, 'Ali Nazik', 240.00), (2, 'Kuşbaşı Pide', 180.00),
+(2, 'Lahmacun', 60.00), (2, 'İçli Köfte', 50.00), (2, 'Gavurdağı Salatası', 90.00), (2, 'Künefe', 120.00), (2, 'Ayran', 30.00),
+(3, 'Klasik Burger', 160.00), (3, 'Cheeseburger', 180.00), (3, 'Mushroom Burger', 190.00), (3, 'Barbekü Burger', 185.00), (3, 'Tavuk Burger', 140.00),
+(3, 'Patates Kızartması', 60.00), (3, 'Soğan Halkası', 50.00), (3, 'Nugget', 70.00), (3, 'Kutu Kola', 35.00), (3, 'Sufle', 90.00),
+(4, 'Çipura Izgara', 250.00), (4, 'Levrek Izgara', 260.00), (4, 'Hamsi Tava', 180.00), (4, 'İstavrit Tava', 170.00), (4, 'Kalamar Tava', 210.00),
+(4, 'Karides Güveç', 240.00), (4, 'Midye Dolma', 70.00), (4, 'Roka Salatası', 80.00), (4, 'Şalgam Suyu', 30.00), (4, 'Fırın Helva', 85.00),
+(5, 'Profiterol', 110.00), (5, 'Trileçe', 95.00), (5, 'Tiramisu', 120.00), (5, 'San Sebastian Cheesecake', 140.00), (5, 'Orman Meyveli Pasta', 130.00),
+(5, 'Mozaik Pasta', 70.00), (5, 'Makaron', 150.00), (5, 'Filtre Kahve', 60.00), (5, 'Türk Kahvesi', 50.00), (5, 'Çay', 20.00);
+
+-- AskidaYemekHavuzu ve Kullanım Tablolarına Veri Eklenmesi
+INSERT INTO AskidaYemekHavuzu (BagisciMusteriID, BagisTuru, ToplamTutar, KalanBakiye)
+VALUES 
+(1, 'Bakiye', 500.00, 500.00), (NULL, 'Yemek', 180.00, 180.00), (3, 'Yemek', 220.00, 220.00),
+(NULL, 'Bakiye', 1000.00, 1000.00), (5, 'Yemek', 480.00, 480.00), (7, 'Bakiye', 250.00, 250.00),
+(NULL, 'Yemek', 360.00, 360.00), (10, 'Yemek', 550.00, 550.00), (11, 'Bakiye', 750.00, 750.00),
+(NULL, 'Yemek', 600.00, 600.00);
+
+INSERT INTO AskidaYemekKullanimlari (IhtiyacSahibiMusteriID, HavuzID, KullanilanTutar)
+VALUES 
+(2, 1, 150.00), (4, 2, 45.00), (6, 4, 300.00), (9, 5, 160.00), (12, 1, 200.00);
