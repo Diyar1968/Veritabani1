@@ -181,3 +181,23 @@ GO
 INSERT INTO AskidaYemekKullanimlari (IhtiyacSahibiMusteriID, HavuzID, KullanilanTutar)
 VALUES 
 (2, 1, 150.00), (4, 2, 45.00), (6, 4, 300.00), (9, 5, 160.00), (12, 1, 200.00);
+
+-- GÖRÜNÜMLER (VIEWS)
+CREATE VIEW vw_AktifRestoranMenuleri AS
+SELECT r.Ad AS RestoranAdi, m.UrunAdi, m.Fiyat
+FROM Restoranlar r
+INNER JOIN Menuler m ON r.RestoranID = m.RestoranID
+WHERE r.IsActive = 1 AND m.IsActive = 1;
+GO
+
+CREATE VIEW vw_AskidaYemekHavuzDurumu AS
+SELECT HavuzID, BagisTuru, ToplamTutar, KalanBakiye, BagisTarihi
+FROM AskidaYemekHavuzu
+WHERE KalanBakiye > 0;
+GO
+
+-- İNDEKSLER (INDEXES)
+CREATE NONCLUSTERED INDEX IX_Siparisler_MusteriID ON Siparisler(MusteriID);
+GO
+CREATE NONCLUSTERED INDEX IX_Menuler_RestoranID ON Menuler(RestoranID);
+GO
