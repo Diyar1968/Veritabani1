@@ -198,6 +198,67 @@ GO
 
 -- İNDEKSLER (INDEXES)
 CREATE NONCLUSTERED INDEX IX_Siparisler_MusteriID ON Siparisler(MusteriID);
+-- TETİKLEYİCİLER (TRIGGERS)
+CREATE TRIGGER trg_AskidaYemek_BakiyeDusur
+ON AskidaYemekKullanimlari
+AFTER INSERT
+AS
+BEGIN
+    UPDATE h
+    SET h.KalanBakiye = h.KalanBakiye - i.KullanilanTutar
+    FROM AskidaYemekHavuzu h
+    INNER JOIN inserted i ON h.HavuzID = i.HavuzID;
+END;
+GO
+
+CREATE TRIGGER trg_BakiyeKontrol
+ON AskidaYemekKullanimlari
+INSTEAD OF INSERT
+AS
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN AskidaYemekHavuzu h ON i.HavuzID = h.HavuzID
+        WHERE h.KalanBakiye < i.KullanilanTutar
+    )
+    BEGIN
+        RAISERROR('Hata: Havuzda bu işlem için yeterli bakiye bulunmamaktadır!', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO AskidaYemekKullanimlari (IhtiyacSahibiMusteriID, HavuzID, KullanilanTutar, KullanimTarihi)
+        SELECT IhtiyacSahibiMusteriID, HavuzID, KullanilanTutar, ISNULL(KullanimTarihi, GETDATE()) FROM inserted;
+    END
+END;
+GO
+
+/* ========================================================================================
+   İLERİ DÜZEY SORGULAR (DQL & Analitik) - TEST SORGULARI
+======================================================================================== */
+/*
+-- 1. JOIN Kullanımı - Detaylı Sipariş Fişi Sorgusu
+SELECT s.SiparisID, m.Ad + ' ' + m.Soyad AS MusteriAdSoyad, r.Ad AS RestoranAdi, k.Ad + ' ' + k.Soyad AS KuryeAdSoyad, s.ToplamTutar, s.SiparisTarihi, s.Durum
+FROM Siparisler s
+INNER JOIN Musteriler m ON s.MusteriID = m.MusteriID
+INNER JOIN Restoranlar r ON s.RestoranID = r.RestoranID
+LEFT JOIN Kuryeler k ON s.KuryeID = k.KuryeID;
+
+-- 2. Agregasyon ve Gruplama (GROUP BY & HAVING)
+SELECT r.Ad AS RestoranAdi, COUNT(s.SiparisID) AS ToplamSiparisSayisi, AVG(s.ToplamTutar) AS OrtalamaSepetTutari, SUM(s.ToplamTutar) AS ToplamCiro
+FROM Siparisler s
+INNER JOIN Restoranlar r ON s.RestoranID = r.RestoranID
+WHERE s.SiparisTarihi >= DATEADD(month, -1, GETDATE())
+GROUP BY r.Ad
+HAVING COUNT(s.SiparisID) > 5;
+
+-- 3. Alt Sorgu (Subquery - NOT EXISTS)
+SELECT m.MusteriID, m.Ad, m.Soyad, m.Email
+FROM Musteriler m
+WHERE NOT EXISTS (SELECT 1 FROM AskidaYemekHavuzu a WHERE a.BagisciMusteriID = m.MusteriID)
+AND m.MusteriID IN (SELECT DISTINCT MusteriID FROM Siparisler);
+*/
 GO
 CREATE NONCLUSTERED INDEX IX_Menuler_RestoranID ON Menuler(RestoranID);
 GO
