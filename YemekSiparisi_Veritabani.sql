@@ -125,6 +125,57 @@ VALUES
 (1, 'Bakiye', 500.00, 500.00), (NULL, 'Yemek', 180.00, 180.00), (3, 'Yemek', 220.00, 220.00),
 (NULL, 'Bakiye', 1000.00, 1000.00), (5, 'Yemek', 480.00, 480.00), (7, 'Bakiye', 250.00, 250.00),
 (NULL, 'Yemek', 360.00, 360.00), (10, 'Yemek', 550.00, 550.00), (11, 'Bakiye', 750.00, 750.00),
+
+    -- Siparisler ve SiparisDetaylari Tablolarına 100 Adet Sipariş Eklenmesi
+DECLARE @Sayac INT = 1;
+DECLARE @RandomMusteriID INT, @RandomRestoranID INT, @RandomKuryeID INT;
+DECLARE @RandomUrunID1 INT, @RandomUrunID2 INT;
+DECLARE @BirimFiyat1 DECIMAL(10,2), @BirimFiyat2 DECIMAL(10,2);
+DECLARE @Adet1 INT, @Adet2 INT;
+DECLARE @SiparisTutari DECIMAL(10,2);
+DECLARE @EklenenSiparisID INT;
+
+WHILE @Sayac <= 100
+BEGIN
+    SET @RandomMusteriID = (ABS(CHECKSUM(NEWID())) % 20) + 1;
+    SET @RandomRestoranID = (ABS(CHECKSUM(NEWID())) % 5) + 1;
+    SET @RandomKuryeID = (ABS(CHECKSUM(NEWID())) % 5) + 1;
+    
+    SET @RandomUrunID1 = ((@RandomRestoranID - 1) * 10) + (ABS(CHECKSUM(NEWID())) % 10) + 1;
+    SET @RandomUrunID2 = ((@RandomRestoranID - 1) * 10) + (ABS(CHECKSUM(NEWID())) % 10) + 1;
+    
+    SET @Adet1 = (ABS(CHECKSUM(NEWID())) % 3) + 1;
+    SET @Adet2 = (ABS(CHECKSUM(NEWID())) % 3) + 1;
+
+    SELECT @BirimFiyat1 = Fiyat FROM Menuler WHERE UrunID = @RandomUrunID1;
+    SELECT @BirimFiyat2 = Fiyat FROM Menuler WHERE UrunID = @RandomUrunID2;
+    
+    IF @RandomUrunID1 = @RandomUrunID2
+    BEGIN
+        SET @SiparisTutari = (@BirimFiyat1 * @Adet1);
+    END
+    ELSE
+    BEGIN
+        SET @SiparisTutari = (@BirimFiyat1 * @Adet1) + (@BirimFiyat2 * @Adet2);
+    END
+
+    INSERT INTO Siparisler (MusteriID, RestoranID, KuryeID, ToplamTutar, Durum, SiparisTarihi)
+    VALUES (@RandomMusteriID, @RandomRestoranID, @RandomKuryeID, @SiparisTutari, 'Teslim Edildi', DATEADD(day, -(@Sayac % 30), GETDATE()));
+    
+    SET @EklenenSiparisID = SCOPE_IDENTITY();
+    
+    INSERT INTO SiparisDetaylari (SiparisID, UrunID, Adet, BirimFiyat)
+    VALUES (@EklenenSiparisID, @RandomUrunID1, @Adet1, @BirimFiyat1);
+
+    IF @RandomUrunID1 <> @RandomUrunID2
+    BEGIN
+        INSERT INTO SiparisDetaylari (SiparisID, UrunID, Adet, BirimFiyat)
+        VALUES (@EklenenSiparisID, @RandomUrunID2, @Adet2, @BirimFiyat2);
+    END
+
+    SET @Sayac = @Sayac + 1;
+END;
+GO
 (NULL, 'Yemek', 600.00, 600.00);
 
 INSERT INTO AskidaYemekKullanimlari (IhtiyacSahibiMusteriID, HavuzID, KullanilanTutar)
