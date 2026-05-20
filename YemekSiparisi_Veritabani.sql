@@ -56,3 +56,23 @@ CREATE TABLE SiparisDetaylari (
     Adet INT CHECK (Adet > 0),
     BirimFiyat DECIMAL(10, 2) CHECK (BirimFiyat > 0)
 );
+
+
+-- 7. ASKIDA YEMEK HAVUZU TABLOSU
+CREATE TABLE AskidaYemekHavuzu (
+    HavuzID INT IDENTITY(1,1) PRIMARY KEY,
+    BagisciMusteriID INT NULL FOREIGN KEY REFERENCES Musteriler(MusteriID),
+    BagisTuru NVARCHAR(20) CHECK (BagisTuru IN ('Bakiye', 'Yemek')),
+    ToplamTutar DECIMAL(10, 2) CHECK (ToplamTutar > 0),
+    KalanBakiye DECIMAL(10, 2) CHECK (KalanBakiye >= 0),
+    BagisTarihi DATETIME DEFAULT GETDATE()
+);
+
+-- 8. ASKIDA YEMEK KULLANIMLARI TABLOSU
+CREATE TABLE AskidaYemekKullanimlari (
+    KullanimID INT IDENTITY(1,1) PRIMARY KEY,
+    IhtiyacSahibiMusteriID INT FOREIGN KEY REFERENCES Musteriler(MusteriID),
+    HavuzID INT FOREIGN KEY REFERENCES AskidaYemekHavuzu(HavuzID),
+    KullanilanTutar DECIMAL(10, 2) CHECK (KullanilanTutar > 0),
+    KullanimTarihi DATETIME DEFAULT GETDATE()
+);
